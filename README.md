@@ -1,0 +1,2 @@
+TODO: 将main进行拆分，使得构建有持续输出的部分抽象为一个接受Union[label2cmd_color_terminalString]和process_obj的函数。
+评估：当前还算简单，再加逻辑会导致耦合，问题很大吗？挺大的。
