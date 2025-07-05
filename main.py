@@ -34,6 +34,7 @@ def process_listener(
             if exit_string and exit_string in output.strip():
                 shutdown = True
                 print(f"检测到终止字符串 '{exit_string}'，即将退出程序")
+            time.sleep(0.1)
     finally:
         process.stdout.close()
 
@@ -120,7 +121,7 @@ done
     ]
 
     # 启动所有命令配置
-    processes = start_command_profiles(profiles)
+    processes = start_command_profiles([profiles[0]])
     if not processes:
         return
 
