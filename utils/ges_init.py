@@ -83,7 +83,7 @@ adb -s localhost:5555 shell "dumpsys window displays | grep init=" | awk -F' ' '
 
 
 class CommandExecutionProfile:
-    def __init__(self, label: str, cmd_list: List[str], terminal_string: str, color: str):
+    def __init__(self, label: str, cmd_list: List[str], terminal_string: str|None, color: str):
         """
         初始化对象
         :param label: 标签字符串
@@ -95,7 +95,7 @@ class CommandExecutionProfile:
             raise TypeError("label must be a string")
         if not isinstance(cmd_list, list) or not all(isinstance(item, str) for item in cmd_list):
             raise TypeError("cmd_list must be a list of strings")
-        if not isinstance(terminal_string, str):
+        if not isinstance(terminal_string, str) and terminal_string is not None:
             raise TypeError("terminal_string must be a string")
         if not isinstance(color, str):
             raise TypeError("color must be a string")

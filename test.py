@@ -4,25 +4,12 @@ import queue
 import time
 from typing import Optional, Union, Tuple, List
 from utils.clolorful_print import print_color
-from utils.ges_init import connect_get_info
+from utils.ges_init import connect_get_info, CommandExecutionProfile
 
 # 定义队列用于线程间通信
 output_queue = queue.Queue[str]()
 shutdown = False  # 全局退出标志
 
-class CommandExecutionProfile:
-    def __init__(self, label: str, cmd_list: List[str], terminal_string: Optional[str], color: str):
-        """
-        初始化命令执行配置
-        :param label: 输出标签
-        :param cmd_list: 命令列表
-        :param terminal_string: 终止字符串(可选)
-        :param color: 打印颜色
-        """
-        self.label = label
-        self.cmd_list = cmd_list
-        self.terminal_string = terminal_string
-        self.color = color
 
 def process_listener(
     process: subprocess.Popen,
@@ -98,13 +85,35 @@ def main() -> None:
     profiles = [
         CommandExecutionProfile(
             label="event",
-            cmd_list=["bash", "-c", "echo 1"],
+            cmd_list=[
+    "bash", "-c",     
+    "date +'%H-%M-%S'; adb -s localhost:5555 shell \"getevent -lt | grep -E 'ABS_MT_TRACKING_ID|ABS_MT_POSITION_|KEY_VOLUMEUP         DOWN'\""
+            ],
             terminal_string="KEY_VOLUMEUP",
             color="GREEN"
         ),
         CommandExecutionProfile(
             label="orientation",
-            cmd_list=['adb', '-s', 'localhost:5555', 'shell', 'echo 1'],
+            cmd_list=[
+        'adb', 
+        '-s', 'localhost:5555', 
+        'shell', 
+        """
+while true; do
+    cur=$(dumpsys window displays | grep init= | awk -F' ' '{
+        split($1,a,"x");
+        split($3,b,"x");
+        if(a[2]==b[2]){print 1}else{print 0}
+    }')
+    if [ "$cur" != "$prev" ]; then
+        time=$(date +'%H-%M-%S')
+        echo "[DEBUG] 方向变化检测: 时间 $time, 前一个状态 prev: $prev, 当前状态 cur: $cur"
+        prev=$cur
+    fi
+    sleep 1
+done
+""".strip()
+    ],
             terminal_string=None,
             color="RED"
         )
